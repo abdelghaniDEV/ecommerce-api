@@ -33,9 +33,6 @@ const getProducts = asyncWrapper(async (req, res) => {
   let categories = req.query.category || "";
   const size = req.query.size || ""; // New filter for size
 
-  console.log("category" , categories);
-  
-
   let filter = {};
 
   // 🔹 Search Filter

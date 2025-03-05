@@ -18,13 +18,12 @@ const createRating = asyncWrapper(async (req, res) => {
   }
 
   if (!mongoose.Types.ObjectId.isValid(newData.product)) {
-    console.log("productsId",newData.product)
+    console.log("productsId", newData.product);
     return res.status(400).json({
       status: "ERROR",
       message: "Invalid product ID",
     });
   }
-  
 
   const productExists = await Product.findById(newData.product);
   if (!productExists) {
@@ -73,11 +72,43 @@ const createRating = asyncWrapper(async (req, res) => {
 
 // get all ratings
 const getRatings = asyncWrapper(async (req, res) => {
-  const ratings = await Rating.find({}).populate("product");
-  res.json({
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const ratings = await Rating.find({})
+    .populate({
+      path: "product",
+      populate: {
+        path: "categories",
+      },
+    })
+    .sort({ created_at: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const totalReviews = await Rating.countDocuments();
+  const goodReviews = await Rating.countDocuments({ rating: { $gte: 4 } });
+  const badReviews = await Rating.countDocuments({ rating: { $lte: 2 } });
+
+  // حساب متوسط التقييمات باستخدام aggregate
+  const averageRatingResult = await Rating.aggregate([
+    { $group: { _id: null, avgRating: { $avg: "$rating" } } },
+  ]);
+
+  const averageRating =
+    averageRatingResult.length > 0 ? averageRatingResult[0].avgRating : 0;
+
+  res.status(200).json({
     status: "SUCCESS",
     count: ratings.length,
-    ratings,
+    totalReviews,
+    goodReviews,
+    badReviews,
+    averageRating: averageRating.toFixed(2), // تقريب الرقم العشري إلى خانتين
+    totalPages: Math.ceil(totalReviews / limit),
+    currentPage: page,
+    data: ratings,
   });
 });
 
@@ -96,20 +127,19 @@ const deleteRating = asyncWrapper(async (req, res) => {
   });
 });
 
-const getRatingByProductID = asyncWrapper (async (req , res) => {
+const getRatingByProductID = asyncWrapper(async (req, res) => {
   const ratings = await Rating.find({ product: req.params.ratingID });
   // console.log(req.params.productID)
   res.json({
-    status: 'SUCCESS',
+    status: "SUCCESS",
     count: ratings.length,
     ratings,
   });
-})
-  
+});
 
 module.exports = {
   createRating,
   getRatings,
   deleteRating,
-  getRatingByProductID
+  getRatingByProductID,
 };
