@@ -8,7 +8,7 @@ const orderShema = new mongoose.Schema({
   country : { type: String, required: true},
   city : { type: String, required: true},
   zipCode : { type: String, required: true},
-
+  orderCode : {type : String , required: true},
   products: [
     {
       product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
@@ -20,7 +20,7 @@ const orderShema = new mongoose.Schema({
   ],
   totalItems : { type: Number, required: true},
   totalPrice: { type: Number, required: true },
-  status: { type: String, required: true, default : "pending" , enum: ["pending", "processing", "shipped", "delivered", "cancelled"] },
+  status: { type: String, required: true, default : "pending" , enum: ["pending", "confirmed", "shipped", "delivered", "cancelled"] },
   createdAt: { type: Date, default: Date.now },
 });
 

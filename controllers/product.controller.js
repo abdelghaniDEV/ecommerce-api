@@ -130,7 +130,8 @@ const getSingleProduct = asyncWrapper(async (req, res) => {
 // update products
 const updateProduct = asyncWrapper(async (req, res) => {
   const { productID } = req.params;
-  let updatedProduct = req.body;
+  let updatedProduct = req.body;  
+  console.log(updatedProduct)
 
   // استخراج الصور القديمة من `req.body`
   const existingImages = JSON.parse(req.body.existingImages || "[]");

@@ -23,13 +23,13 @@ router
     ],
     createOrder
   )
-  .get(authenticate, getAllOrders);
+  .get(getAllOrders);
 
 router
   .route("/:orderID")
   .delete(deletOrder)
   .put(authenticate, updateOrder)
-  .get(authenticate, getSingleOrder);
-router.route("/:orderID/status").put(authenticate, updateOrderStatus);
+  .get(getSingleOrder);
+router.route("/:orderID/status").put(updateOrderStatus);
 
 module.exports = router;

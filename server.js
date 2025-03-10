@@ -9,7 +9,7 @@ const app = express();
 // connect
 connectDB()
 
-const origin = ['http://localhost:3001' ,  'http://localhost:3000']
+const origin = ['http://localhost:3001' ,  'http://localhost:3000' , 'https://admin-arwa.vercel.app']
 
 app.use(
     cors({
